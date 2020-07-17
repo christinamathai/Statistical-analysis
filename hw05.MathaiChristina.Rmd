@@ -1,0 +1,241 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: 
+    keep_tex: yes
+    latex_engine: xelatex
+  html_notebook: default
+---
+
+1. You teacher has a friend, Dr. Huang, he thinks his maximum fastball velocity is faster than average adult. His max veloity is 52 miles per hour (True story). So you teacher measured 100 randomly selected adult, and obtain a mean velocity of 48 miles per hour, and standard deviation of 5 miles per hour(This part is fiction). Please answer the following questions, measure in miles per hour(mph) and show your work for each question.
+1.a. Formalize the null hypothesis.
+```{r}
+s_1 = 5 / sqrt(100)
+s_1
+```
+
+$$ n = 100,\space \bar x = 48, \space s = 5, \space se = \frac {s} {\sqrt n} = 0.5 $$
+$$Null \space hypothesis: \space \mu_0 = 48 $$
+1.b. What’s the alternative hypothesis?
+$$Alternative \space hypothesis  = \mu_1 > 48$$
+1.c. What is test statistic can you use to test the hypothesis?
+```{r}
+t_stats <- (48 - 52) / s_1
+t_stats
+```
+$$ Test \space Statistics = \frac {\bar x - \mu} {se} = \frac {48 - 52} {0.5} = -8$$
+
+1.d. Do you prefer a one-tailed or two-tailed test in this case? Explain why.
+One tailed test concentrates on the area of distribution so that it is either lesser than or greater than a certain value but not both. I would prefer a two tailed test because it is easier than the one tailed test since the data can be extreme in either direction to reject the null. 
+
+1.e. What is your α and threshold (t-statistic) value or values for your rejection region? (Whatever you prefer is fine, just be sure to state it and explain why you chose it.)
+alpha = 0.05 since its one of the most used values and is a conservative value. To calculate threshold values for the rejection region
+```{r}
+dof <- 100 - 1
+lower1 <- qt(0.025, dof)
+lower1
+
+upper1 <- qt(0.975, dof)
+upper1
+```
+$$ -1.984217 < - 8 <   1.984217$$
+The rejection region is a t-statistic greater than 1.984 and lower than -1.984
+
+1.f.Can you reject the null under a one-tailed test?
+```{r}
+t_oneside <- qt(.95, dof)
+t_oneside
+```
+Since, the t-statistic falls under the rejection region defined under the one-tailed test, we reject the null hypothesis
+
+1.g.Can you reject the null under a two-tailed test?
+Since, the t-statistic falls under the rejection region defined under the two-tailed test, we reject the null hypothesis. 
+
+1.h. What is the 95% confidence interval of the test?
+```{r}
+err <- qt(0.975, dof) * s_1
+lower_CI <- 48 - err
+lower_CI
+upper_CI <- 48 + err
+upper_CI
+```
+95% CI if null hypothesis was true is : [ 47.0079 mph , 48.9921 mph ]
+
+1.i. What is the p-value of the test results?
+```{r}
+pVal <- 2*(1 - pt(8, dof))
+pVal
+```
+
+
+
+
+2. Your friend thinks that men and women have different skill levels in playing Tetris - for whatever reason -. To test this, you have 50 men and 50 women play the game in a controlled setting. The mean score of the men is 1,124 with a standard deviation of 200 and the mean score for the women is 1,245, also with a standard deviation of 200
+```{r}
+m_mean <- 1124
+m_sd <- 200
+m_n <- 50
+m_se <- m_sd/sqrt(m_n)
+
+w_mean <- 1245
+w_sd <- 200
+w_n <- 50
+w_se <- w_sd/sqrt(w_n)
+
+se_diff <- sqrt(m_se ^ 2 + w_se ^ 2)
+#Since mean and sd of both men and women are same
+dof1 <- m_n + w_n - 2
+```
+
+
+2.a. Test if the male average is statistically greater than the female average.
+$$H_0 = \mu_{men} < \mu_{women} $$
+$$H_1 = \mu_{men} > \mu_{women} $$
+```{r}
+t_stat <- (m_mean - w_mean) / se_diff
+t_stat
+t_oneside <- qt(0.95, dof1)
+t_oneside
+pVal1 <- (1 - pt(t_stat, dof1))
+pVal1
+```
+Since the difference between the average values of men and women do not fall under the rejection area, there is no statistical evidence that the male average value is greater than the women average value with high p-value
+
+2.b. Test if the female average is statistically greater than the male average.
+```{r}
+t_stat <- (w_mean - m_mean) / se_diff
+t_stat
+t_oneside <- qt(0.95, dof1)
+t_oneside
+pVal2 <- (1 - pt(t_stat, dof1))
+pVal2
+```
+The p-value is lesser than 0.05 and the t-statistics falls within the rejection region and therefore accept the alternate hypothesis that is statistical evidence that the average score of women is not lesser than to that of men. 
+
+2.c. Test if the two averages are different.
+```{r}
+t_upperReject <- qt(.975, dof1) 
+t_upperReject
+t_lowerReject <- qt(.025, dof1) 
+t_lowerReject
+
+pVal3 <- 2 * (1 - pt(t_stat, dof1))
+pVal3
+
+```
+There is statistical evidence that the two averages are different because the average score of men and women falls within the rejection area and hence the null hypothesis is rejected. Also the p-value is less than 0.05
+
+
+
+3.You think drinking the night before an exam might help performance on the exam the next morning. To test this, you select 100 of your closest friends, and randomly get 50 of them drunk the night before the exam, which you denote the treatment group. The next day, the treatment group gets a mean of 78 with a standard deviation of 10 and the control group gets a 75 with a standard deviation of 5.
+Does the evidence show that drinking helped exam performance?
+```{r}
+n_1 = 50
+x_1 = 78
+s_1 = 10
+se_1 = s_1/sqrt(n_1)
+se_1
+
+n_2 = 50
+x_2 = 75
+s_2 = 5
+se_2 = s_2/sqrt(n_2)
+se_2
+
+#T distribution
+se_diff = sqrt((se_1) ^ 2 + (se_2) ^ 2)
+se_diff
+t_s = (x_2 - x_1) / se_diff
+t_s
+val1 <- ((se_1) ^ 4) / (n_1 - 1)
+val1
+val2 <- ((se_2) ^ 4) / (n_2 - 1)
+val2
+df = (se_diff ^ 2) / (val1 + val2)
+df
+#assuming p value as 0.95
+lower <- qt(0.025, 28.82)
+lower
+upper <- qt(0.975, 28.82)
+upper
+```
+
+$$ sample \space with  \space drunk \space group$$
+$$n_1 = total \space number, \space \bar x_1 = mean, \space s_1 = standard \space deviation, \space se_1 = standard error$$
+$$n_1 = 50, \space \bar  x_1 = 78, \space s_1 = 10, se_1 = s_1/\sqrt (n_1) = 1.4$$
+
+
+$$control \space  group \\$$
+$$n_2 = 50, \space \bar x_2 = 75, \space s_2 = 5, se_1 = s_1/\sqrt (n_1) = 0.70 $$
+
+$$T \space distribution$$
+$$se_d = \sqrt (se_1^2) + (se_2 ^2) = 1.58$$
+
+$$\frac {\bar x_2 - \bar x_1} {se_d} = \frac {78 - 75} {1.58} = 1.89$$
+
+$$Calculate \space degree \space of \space freedom$$
+
+$$val1 = \frac { (se_1) ^ 4} {n_1 -1} = 0.08$$
+$$val2 = \frac { (se_2) ^ 4} {n_2 -1} = 0.005$$
+$$df = \frac {(se_d) ^ 2} {val1 + val2} = 28.82$$
+
+$$lower = -2.045785, \space upper = 2.045785$$
+$$ −2.045 < 1.89 < 2.045 $$
+ 
+$$Since \space 1.89 \space lies \space between \space the  \space range, \space we \space cannot \space reject \space the \space null \space hypothesis $$
+4. Using data of your choosing use R to conduct the following tests, and explain (i.e. interpret) the results you get. You can download your own data from the internet - in such case provide a link to it - or data from R’s built-in datasets as long as you are not using the class examples for this week: 
+4.a. A standard one-sample hypothesis test.
+```{r}
+data("mtcars")
+t.test(mtcars$disp, alternative = "two.sided", mu = 60)
+```
+$$P(186.03 < \mu < 275.4) = 0.95 $$
+Assuming Null hypothesis with mu = 60. Since mu is out of the interval, the null hypothesis is rejected and the estimate for mu is 230.72
+
+4.b. A difference-in-means test with independent samples.
+
+```{r}
+#study in which the respiratory tests are being calculated percentage wise on individuals who have caffeine during the study and individuals who are given placebo 
+Caffeine <- c(88, 94, 96, 105, 89, 93, 99)
+Placebo <- c(98, 100, 96, 95, 97, 101, 119)
+
+t.test(Caffeine, Placebo, mu = 0, conf.level = 0.95, alternative="two.sided")
+```
+
+$$P(-14.458023 < \mu < 2.458023) = 0.95 $$
+
+Assuming Null hypothesis with mu = 0. Since mu is inside of the interval, we cannot reject the null hypothesis
+
+
+4.c. A difference-in-means test with dependent samples (ie, a paired t-test).
+```{r}
+#study in which standing and supine systolic blood pressures were compared
+Standing <- c(132, 146, 135, 141, 139, 162, 128, 137, 145, 151, 131, 143)
+Supine <- c(136, 145, 140, 147, 142, 160, 137, 136, 149, 158, 120, 150)
+t.test(Standing, Supine, mu = 0,conf.level = 0.95, paired = TRUE)
+```
+
+$$ P(-5.99 < \mu < 0.99) = 0.95$$
+Assuming Null hypothesis with mu = 0. Since mu is inside of the interval, we cannot reject the null hypothesis
+
+4.d. Manually verify the results in (a) using the mean and sd as calculated by R (i.e, you don’t have to manually calculate the mean or sd by hand!).
+```{r}
+mean_val <- mean(mtcars$disp)
+mean_val
+std_dev <- sd(mtcars$disp)
+std_dev
+n <- length(mtcars$disp)
+n
+se <- std_dev/(sqrt(n))
+se
+mu <- 60
+t <- (mean_val - mu) / se
+low_int <- qt(0.025, n - 1)
+hig_int <- qt(0.975, n - 1)
+l_mu95 <- ((low_int) * se) + mean_val
+l_mu95
+h_mu95 <- ((hig_int) * se) + mean_val
+h_mu95
+
+#as compared to (a) the results are the same where the null hypothesis is rejected
+```
